@@ -1,0 +1,19 @@
+minimum_cumulusci_version: '3.0.2'
+project:
+    name: lwc-recipes
+    package:
+        name:  lwc-recipes
+        api_version: '46.0'
+    source_format: sfdx
+
+tasks:
+    robot:
+        options:
+            suites: robot/lwc-recipes/tests
+            options:
+                outputdir: robot/lwc-recipes/results
+
+    robot_testdoc:
+        options:
+            path: robot/lwc-recipes/tests
+            output: robot/lwc-recipes/doc/lwc-recipes_tests.html
