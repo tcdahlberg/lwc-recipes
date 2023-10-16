@@ -12,8 +12,14 @@ describe('c-api-property', () => {
         }
     });
 
+    // Helper function to wait until the microtask queue is empty. This is needed for promise
+    // timing when calling imperative Apex.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+
     it('renders c-chart-bar component with a default percentage value', () => {
-        // Create initial element
+        // Create component
         const element = createElement('c-api-property', {
             is: ApiProperty
         });
@@ -27,29 +33,37 @@ describe('c-api-property', () => {
         expect(chartBarEl.percentage).toBe(PERCENTAGE_DEFAULT);
     });
 
-    it('changes the value of the c-chart-bar child component based on user input', () => {
-        // Create initial element
+    it('changes the value of the c-chart-bar child component based on user input', async () => {
+        // Create component
         const element = createElement('c-api-property', {
             is: ApiProperty
         });
         document.body.appendChild(element);
 
         // Select input field for simulating user input
-        const lightningInputEl = element.shadowRoot.querySelector(
-            'lightning-input'
-        );
+        const lightningInputEl =
+            element.shadowRoot.querySelector('lightning-input');
         lightningInputEl.value = PERCENTAGE_CUSTOM;
         lightningInputEl.dispatchEvent(new CustomEvent('change'));
 
         // Query chart-bar component
         const chartBarEl = element.shadowRoot.querySelector('c-chart-bar');
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Query newly set public property on chart-bar component
-            expect(chartBarEl.percentage).toBe(PERCENTAGE_CUSTOM);
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Query newly set public property on chart-bar component
+        expect(chartBarEl.percentage).toBe(PERCENTAGE_CUSTOM);
+    });
+
+    it('is accessible', async () => {
+        // Create component
+        const element = createElement('c-api-property', {
+            is: ApiProperty
         });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

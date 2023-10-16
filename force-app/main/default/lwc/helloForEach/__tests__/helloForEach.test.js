@@ -16,7 +16,7 @@ describe('c-hello-for-each', () => {
             'Jennifer Wu, CEO'
         ];
 
-        // Create initial element
+        // Create component
         const element = createElement('c-hello-for-each', {
             is: HelloForEach
         });
@@ -27,5 +27,15 @@ describe('c-hello-for-each', () => {
             element.shadowRoot.querySelectorAll('li')
         ).map((li) => li.textContent);
         expect(contacts).toEqual(EXPECTED);
+    });
+
+    it('is accessible on initialization', async () => {
+        const element = createElement('c-hello-for-each', {
+            is: HelloForEach
+        });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

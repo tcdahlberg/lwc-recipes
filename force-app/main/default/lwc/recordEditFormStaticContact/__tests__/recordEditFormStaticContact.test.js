@@ -13,7 +13,7 @@ describe('c-record-edit-form-static-contact', () => {
         const RECORD_ID_INPUT = '0031700000pJRRSAA4';
         const OBJECT_API_NAME_INPUT = 'Contact';
 
-        // Create initial element
+        // Create component
         const element = createElement('c-record-edit-form-static-contact', {
             is: RecordEditFormStaticContact
         });
@@ -61,7 +61,7 @@ describe('c-record-edit-form-static-contact', () => {
         const RECORD_ID_INPUT = '0031700000pJRRSAA4';
         const OBJECT_API_NAME_INPUT = 'Contact';
 
-        // Create initial element
+        // Create component
         const element = createElement('c-record-edit-form-static-contact', {
             is: RecordEditFormStaticContact
         });
@@ -75,5 +75,15 @@ describe('c-record-edit-form-static-contact', () => {
             element.shadowRoot.querySelectorAll('lightning-input-field')
         ).map((outputField) => outputField.fieldName);
         expect(outputFieldNames).toEqual(INPUT_FIELDS);
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-record-edit-form-static-contact', {
+            is: RecordEditFormStaticContact
+        });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

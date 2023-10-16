@@ -30,42 +30,43 @@ describe('c-misc-shared-java-script', () => {
         jest.clearAllMocks();
     });
 
-    it('calculates mortgage with default values', () => {
-        // Create initial element
+    // Helper function to wait until the microtask queue is empty. This is needed for promise
+    // timing when calling imperative Apex.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+    it('calculates mortgage with default values', async () => {
+        // Create component
         const element = createElement('c-misc-shared-java-script', {
             is: MiscSharedJavaScript
         });
         document.body.appendChild(element);
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise ends in the
-        // rejected state
-        return Promise.resolve().then(() => {
-            // Check if default values for principal, term, and rate are used for mortgage calculcation
-            expect(calculateMonthlyPayment).toHaveBeenCalledWith(
-                PRINCIPAL_DEFAULT,
-                TERM_DEFAULT,
-                RATE_DEFAULT
-            );
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check if default values for principal, term, and rate are used for mortgage calculcation
+        expect(calculateMonthlyPayment).toHaveBeenCalledWith(
+            PRINCIPAL_DEFAULT,
+            TERM_DEFAULT,
+            RATE_DEFAULT
+        );
     });
 
-    it('calculates mortgage with custom values', () => {
-        // Create initial element
+    it('calculates mortgage with custom values', async () => {
+        // Create component
         const element = createElement('c-misc-shared-java-script', {
             is: MiscSharedJavaScript
         });
         document.body.appendChild(element);
 
         // Select input fields for simulating user input
-        const lightningInputEls = element.shadowRoot.querySelectorAll(
-            'lightning-input'
-        );
+        const lightningInputEls =
+            element.shadowRoot.querySelectorAll('lightning-input');
 
         lightningInputEls.forEach((el) => {
             if (el.label === 'Rate') {
@@ -77,27 +78,33 @@ describe('c-misc-shared-java-script', () => {
         });
 
         // Select combobox for simulating user input
-        const lightningComboboxEl = element.shadowRoot.querySelector(
-            'lightning-combobox'
-        );
+        const lightningComboboxEl =
+            element.shadowRoot.querySelector('lightning-combobox');
         lightningComboboxEl.value = TERM_CUSTOM;
         lightningComboboxEl.dispatchEvent(new CustomEvent('change'));
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise ends in the
-        // rejected state
-        return Promise.resolve().then(() => {
-            // Check if default values for principal, term, and rate are used for mortgage calculcation
-            expect(calculateMonthlyPayment).toHaveBeenCalledWith(
-                PRINCIPAL_CUSTOM,
-                TERM_CUSTOM,
-                RATE_CUSTOM
-            );
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check if default values for principal, term, and rate are used for mortgage calculcation
+        expect(calculateMonthlyPayment).toHaveBeenCalledWith(
+            PRINCIPAL_CUSTOM,
+            TERM_CUSTOM,
+            RATE_CUSTOM
+        );
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-misc-shared-java-script', {
+            is: MiscSharedJavaScript
         });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

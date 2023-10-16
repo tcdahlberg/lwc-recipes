@@ -8,7 +8,7 @@ const CONTACT_INPUT = {
     Phone: '4152568563',
     Email: 'amy@demo.net',
     Picture__c:
-        'https://s3-us-west-1.amazonaws.com/sfdc-demo/people/amy_taylor.jpg'
+        'https://s3-us-west-2.amazonaws.com/dev-or-devrl-s3-bucket/sample-apps/people/amy_taylor.jpg'
 };
 
 describe('c-contact-tile', () => {
@@ -20,7 +20,7 @@ describe('c-contact-tile', () => {
     });
 
     it('renders picture, name, title, and phone number based on public property input', () => {
-        // Create initial element
+        // Create component
         const element = createElement('c-contact-tile', {
             is: ContactTile
         });
@@ -45,7 +45,7 @@ describe('c-contact-tile', () => {
     it('renders an informational message if public property is not set', () => {
         const MESSAGE = 'No contact data available.';
 
-        // Create initial element
+        // Create component
         const element = createElement('c-contact-tile', {
             is: ContactTile
         });
@@ -54,5 +54,17 @@ describe('c-contact-tile', () => {
         // Select element for validation
         const detailEl = element.shadowRoot.querySelector('p');
         expect(detailEl.textContent).toBe(MESSAGE);
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-contact-tile', {
+            is: ContactTile
+        });
+
+        element.contact = CONTACT_INPUT;
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

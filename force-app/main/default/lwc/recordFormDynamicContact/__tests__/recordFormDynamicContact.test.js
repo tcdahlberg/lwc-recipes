@@ -20,7 +20,7 @@ describe('c-record-form-dynamic-contact', () => {
         const RECORD_ID_INPUT = '0031700000pJRRSAA4';
         const OBJECT_API_NAME_INPUT = 'Contact';
 
-        // Create initial element
+        // Create component
         const element = createElement('c-record-form-dynamic-contact', {
             is: RecordFormDynamicContact
         });
@@ -36,5 +36,15 @@ describe('c-record-form-dynamic-contact', () => {
         expect(formEl.fields).toEqual(RECORD_FIELDS_INPUT);
         expect(formEl.recordId).toBe(RECORD_ID_INPUT);
         expect(formEl.objectApiName).toBe(OBJECT_API_NAME_INPUT);
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-record-form-dynamic-contact', {
+            is: RecordFormDynamicContact
+        });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

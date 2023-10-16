@@ -1,32 +1,44 @@
-# Salesforce / SFDX / CCI
-.cci
-.sfdx
-/src.orig
-/src
+# This file is used for Git repositories to specify intentionally untracked files that Git should ignore. 
+# If you are not using git, you can delete this file. For more information see: https://git-scm.com/docs/gitignore
+# For useful gitignore templates see: https://github.com/github/gitignore
 
-# Python
-*.pyc
-__pycache__
+# Salesforce cache
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
 
-# Robot Framework results
-robot/lwc-recipes/results/
+# LWC VSCode autocomplete
+jsconfig.json
 
-# Editors
-*.sublime-project
-*.sublime-workspace
-.vscode
-.idea
-.project
-.settings
+# LWC Jest coverage reports
+coverage/
 
-# Misc
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+
+# Eslint cache
+.eslintcache
+
+# MacOS system files
 .DS_Store
 
-# Illuminated Cloud (IntelliJ IDEA)
-IlluminatedCloud
-out
-.idea
-*.iml
+# Windows system files
+Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
 
-# CumulusCI
-/test_results.*
+# VS Code project settings
+.vscode/*
+!.vscode/extensions.json
+
+# Local environment variables
+.env

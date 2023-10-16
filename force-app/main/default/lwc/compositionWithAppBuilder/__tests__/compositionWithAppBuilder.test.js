@@ -10,7 +10,7 @@ describe('c-composition-with-app-builder', () => {
     });
 
     it('reflects public property values', () => {
-        // Create initial element
+        // Create component
         const element = createElement('c-composition-with-app-builder', {
             is: CompositionWithAppBuilder
         });
@@ -23,5 +23,19 @@ describe('c-composition-with-app-builder', () => {
         expect(element.picklistValue).toBe('somePicklist');
         expect(element.stringValue).toBe('someString');
         expect(element.numberValue).toBe(99);
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-composition-with-app-builder', {
+            is: CompositionWithAppBuilder
+        });
+
+        element.picklistValue = 'somePicklist';
+        element.stringValue = 'someString';
+        element.numberValue = 99;
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

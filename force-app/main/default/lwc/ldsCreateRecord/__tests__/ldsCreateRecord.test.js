@@ -18,12 +18,11 @@ describe('c-lds-create-record', () => {
 
     // Helper function to wait until the microtask queue is empty. This is needed for promise
     // timing when calling createRecord.
-    function flushPromises() {
-        // eslint-disable-next-line no-undef
-        return new Promise((resolve) => setImmediate(resolve));
+    async function flushPromises() {
+        return Promise.resolve();
     }
 
-    it('sets value from lightning-input field as parameter to createRecord call', () => {
+    it('sets value from lightning-input field as parameter to createRecord call', async () => {
         const USER_INPUT = 'Gomez Inc.';
         const INPUT_PARAMETERS = [
             { apiName: 'Account', fields: { Name: USER_INPUT } }
@@ -37,26 +36,24 @@ describe('c-lds-create-record', () => {
 
         // Select input field for simulating user input
         const inputEl = element.shadowRoot.querySelector(
-            'lightning-input[class="slds-var-m-bottom_x-small"]'
+            'lightning-input[data-id="name"]'
         );
         inputEl.value = USER_INPUT;
         inputEl.dispatchEvent(new CustomEvent('change'));
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Validate createRecord call
-            expect(createRecord).toHaveBeenCalled();
-            expect(createRecord.mock.calls[0]).toEqual(INPUT_PARAMETERS);
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Validate createRecord call
+        expect(createRecord).toHaveBeenCalled();
+        expect(createRecord.mock.calls[0]).toEqual(INPUT_PARAMETERS);
     });
 
-    it('displays an account id after record creation', () => {
+    it('displays an account id after record creation', async () => {
         const USER_INPUT = 'Gomez Inc.';
 
         // Assign mock value for resolved createRecord promise
@@ -70,29 +67,28 @@ describe('c-lds-create-record', () => {
 
         // Select input field for simulating user input
         const inputEl = element.shadowRoot.querySelector(
-            'lightning-input[class="slds-var-m-bottom_x-small"]'
+            'lightning-input[data-id="name"]'
         );
         inputEl.value = USER_INPUT;
         inputEl.dispatchEvent(new CustomEvent('change'));
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return an immediate flushed promise (after the createRecord call) to then
-        // wait for any asynchronous DOM updates. Jest will automatically wait
-        // for the Promise chain to complete before ending the test and fail
-        // the test if the promise ends in the rejected state.
-        return flushPromises().then(() => {
-            // Select element for validation
-            const displayEl = element.shadowRoot.querySelector(
-                'lightning-input[data-id="accountId"]'
-            );
-            expect(displayEl.value).toBe(mockCreateRecord.id);
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+        await flushPromises();
+        await flushPromises();
+
+        // Select element for validation
+        const displayEl = element.shadowRoot.querySelector(
+            'lightning-input[data-id="accountId"]'
+        );
+        expect(displayEl.value).toBe(mockCreateRecord.id);
     });
 
-    it('displays a success toast after record creation', () => {
+    it('displays a success toast after record creation', async () => {
         const USER_INPUT = 'Gomez Inc.';
 
         // Assign mock value for resolved createRecord promise
@@ -111,26 +107,24 @@ describe('c-lds-create-record', () => {
 
         // Select input field for simulating user input
         const inputEl = element.shadowRoot.querySelector(
-            'lightning-input[class="slds-var-m-bottom_x-small"]'
+            'lightning-input[data-id="name"]'
         );
         inputEl.value = USER_INPUT;
         inputEl.dispatchEvent(new CustomEvent('change'));
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Check if toast event has been fired
-            expect(handler).toHaveBeenCalled();
-            expect(handler.mock.calls[0][0].detail.variant).toBe('success');
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check if toast event has been fired
+        expect(handler).toHaveBeenCalled();
+        expect(handler.mock.calls[0][0].detail.variant).toBe('success');
     });
 
-    it('displays an error toast on createRecord error', () => {
+    it('displays an error toast on createRecord error', async () => {
         const USER_INPUT = 'invalid';
 
         // Assign mock value for rejected createRecord promise
@@ -149,23 +143,30 @@ describe('c-lds-create-record', () => {
 
         // Select input field for simulating user input
         const inputEl = element.shadowRoot.querySelector(
-            'lightning-input[class="slds-var-m-bottom_x-small"]'
+            'lightning-input[data-id="name"]'
         );
         inputEl.value = USER_INPUT;
         inputEl.dispatchEvent(new CustomEvent('change'));
 
-        // Select button for simulating user interaction
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return an immediate flushed promise (after the LDS call) to then
-        // wait for any asynchronous DOM updates. Jest will automatically wait
-        // for the Promise chain to complete before ending the test and fail
-        // the test if the promise ends in the rejected state.
-        return flushPromises().then(() => {
-            // Check if toast event has been fired
-            expect(handler).toHaveBeenCalled();
-            expect(handler.mock.calls[0][0].detail.variant).toBe('error');
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check if toast event has been fired
+        expect(handler).toHaveBeenCalled();
+        expect(handler.mock.calls[0][0].detail.variant).toBe('error');
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-lds-create-record', {
+            is: LdsCreateRecord
         });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

@@ -1,15 +1,9 @@
 import { createElement } from 'lwc';
 import WireGetPicklistValuesByRecordType from 'c/wireGetPicklistValuesByRecordType';
-import { registerLdsTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 import { getPicklistValuesByRecordType } from 'lightning/uiObjectInfoApi';
 
 // Mock realistic data
 const mockGetPicklistValuesByRecordType = require('./data/getPicklistValuesByRecordType.json');
-
-// Register as an LDS wire adapter. Some tests verify the provisioned values trigger desired behavior.
-const getPicklistValuesByRecordTypeAdapter = registerLdsTestWireAdapter(
-    getPicklistValuesByRecordType
-);
 
 describe('c-wire-get-picklist-values-by-record-type', () => {
     afterEach(() => {
@@ -19,9 +13,15 @@ describe('c-wire-get-picklist-values-by-record-type', () => {
         }
     });
 
+    // Helper function to wait until the microtask queue is empty. This is needed for promise
+    // timing when calling imperative Apex.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+
     describe('getPicklistValuesByRecordType @wire data', () => {
-        it('renders a lightning-tree with eight entries', () => {
-            // Create element
+        it('renders a lightning-tree with eight entries', async () => {
+            // Create component
             const element = createElement(
                 'c-wire-get-picklist-values-by-record-type',
                 {
@@ -31,26 +31,22 @@ describe('c-wire-get-picklist-values-by-record-type', () => {
             document.body.appendChild(element);
 
             // Emit data from @wire
-            getPicklistValuesByRecordTypeAdapter.emit(
+            getPicklistValuesByRecordType.emit(
                 mockGetPicklistValuesByRecordType
             );
 
-            // Return a promise to wait for any asynchronous DOM updates. Jest
-            // will automatically wait for the Promise chain to complete before
-            // ending the test and fail the test if the promise rejects.
-            return Promise.resolve().then(() => {
-                // Select elements for validation
-                const treeEl = element.shadowRoot.querySelector(
-                    'lightning-tree'
-                );
-                expect(treeEl).not.toBeNull();
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            // Select elements for validation
+            const treeEl = element.shadowRoot.querySelector('lightning-tree');
+            expect(treeEl).not.toBeNull();
         });
     });
 
     describe('getPicklistValuesByRecordType @wire error', () => {
-        it('shows error panel element', () => {
-            // Create initial element
+        it('shows error panel element', async () => {
+            // Create component
             const element = createElement(
                 'c-wire-get-picklist-values-by-record-type',
                 {
@@ -60,17 +56,55 @@ describe('c-wire-get-picklist-values-by-record-type', () => {
             document.body.appendChild(element);
 
             // Emit error from @wire
-            getPicklistValuesByRecordTypeAdapter.error();
+            getPicklistValuesByRecordType.error();
 
-            // Return a promise to wait for any asynchronous DOM updates. Jest
-            // will automatically wait for the Promise chain to complete before
-            // ending the test and fail the test if the promise rejects.
-            return Promise.resolve().then(() => {
-                const errorPanelEl = element.shadowRoot.querySelector(
-                    'c-error-panel'
-                );
-                expect(errorPanelEl).not.toBeNull();
-            });
+            // Wait for any asynchronous DOM updates
+            await flushPromises();
+
+            // Check for error panel
+            const errorPanelEl =
+                element.shadowRoot.querySelector('c-error-panel');
+            expect(errorPanelEl).not.toBeNull();
         });
+    });
+
+    it('is accessible when picklist values are returned', async () => {
+        // Create component
+        const element = createElement(
+            'c-wire-get-picklist-values-by-record-type',
+            {
+                is: WireGetPicklistValuesByRecordType
+            }
+        );
+        document.body.appendChild(element);
+
+        // Emit data from @wire
+        getPicklistValuesByRecordType.emit(mockGetPicklistValuesByRecordType);
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
+    });
+
+    it('is accessible when error is returned', async () => {
+        // Create component
+        const element = createElement(
+            'c-wire-get-picklist-values-by-record-type',
+            {
+                is: WireGetPicklistValuesByRecordType
+            }
+        );
+        document.body.appendChild(element);
+
+        // Emit error from @wire
+        getPicklistValuesByRecordType.error();
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

@@ -16,7 +16,7 @@ describe('c-hello-iterator', () => {
             'Jennifer Wu, CEO'
         ];
 
-        // Create initial element
+        // Create component
         const element = createElement('c-hello-iterator', {
             is: HelloIterator
         });
@@ -30,7 +30,7 @@ describe('c-hello-iterator', () => {
     });
 
     it('displays div in first and last contacts', () => {
-        // Create initial element
+        // Create component
         const element = createElement('c-hello-iterator', {
             is: HelloIterator
         });
@@ -38,14 +38,25 @@ describe('c-hello-iterator', () => {
 
         // Verify first li's first child is a div
         expect(
-            element.shadowRoot.querySelector('li:first-child').firstChild
+            element.shadowRoot.querySelector('li:first-child').children[0]
                 .tagName
         ).toBe('DIV');
         // Verify last li's last child is a div
         expect(
-            element.shadowRoot.querySelector('li:last-child').lastChild.tagName
+            element.shadowRoot.querySelector('li:last-child').children[0]
+                .tagName
         ).toBe('DIV');
         // Verify no other divs
         expect(element.shadowRoot.querySelectorAll('li > div')).toHaveLength(2);
+    });
+
+    it('is accessible on initialization', async () => {
+        const element = createElement('c-hello-iterator', {
+            is: HelloIterator
+        });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

@@ -19,8 +19,14 @@ describe('c-misc-multiple-templates', () => {
         }
     });
 
+    // Helper function to wait until the microtask queue is empty. This is needed for promise
+    // timing when calling imperative Apex.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
+
     it('displays templateOne on initial render', () => {
-        // Create initial element
+        // Create component
         const element = createElement('c-misc-multiple-templates', {
             is: MiscMultipleTemplates
         });
@@ -36,8 +42,8 @@ describe('c-misc-multiple-templates', () => {
         expect(imgEl.getAttribute('src')).toBe(TEMPLATE1_LOGO_URL);
     });
 
-    it('displays templateTwo on click', () => {
-        // Create initial element
+    it('displays templateTwo on click', async () => {
+        // Create component
         const element = createElement('c-misc-multiple-templates', {
             is: MiscMultipleTemplates
         });
@@ -47,24 +53,22 @@ describe('c-misc-multiple-templates', () => {
         const button = element.shadowRoot.querySelector('lightning-button');
         button.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Once click invoked, templateTwo should be in place.
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
 
-            // Retrieve and verify text element from DOM
-            const pEl = element.shadowRoot.querySelector('p');
-            expect(pEl.textContent).toBe(TEMPLATE2_TEXT_CONTENT);
+        // Once click invoked, templateTwo should be in place.
 
-            // Retrieve and verify image element from DOM
-            const imgEl = element.shadowRoot.querySelector('img');
-            expect(imgEl.getAttribute('src')).toBe(TEMPLATE2_LOGO_URL);
-        });
+        // Retrieve and verify text element from DOM
+        const pEl = element.shadowRoot.querySelector('p');
+        expect(pEl.textContent).toBe(TEMPLATE2_TEXT_CONTENT);
+
+        // Retrieve and verify image element from DOM
+        const imgEl = element.shadowRoot.querySelector('img');
+        expect(imgEl.getAttribute('src')).toBe(TEMPLATE2_LOGO_URL);
     });
 
-    it('displays templateOne after two clicks', () => {
-        // Create initial element
+    it('displays templateOne after two clicks', async () => {
+        // Create component
         const element = createElement('c-misc-multiple-templates', {
             is: MiscMultipleTemplates
         });
@@ -75,19 +79,44 @@ describe('c-misc-multiple-templates', () => {
         button.click();
         button.click();
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Once two clicks invoked, templateOne should be in place.
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
 
-            // Retrieve and verify text element from DOM
-            const pEl = element.shadowRoot.querySelector('p');
-            expect(pEl.textContent).toBe(TEMPLATE1_TEXT_CONTENT);
+        // Once two clicks invoked, templateOne should be in place.
 
-            // Retrieve and verify image element from DOM
-            const imgEl = element.shadowRoot.querySelector('img');
-            expect(imgEl.getAttribute('src')).toBe(TEMPLATE1_LOGO_URL);
+        // Retrieve and verify text element from DOM
+        const pEl = element.shadowRoot.querySelector('p');
+        expect(pEl.textContent).toBe(TEMPLATE1_TEXT_CONTENT);
+
+        // Retrieve and verify image element from DOM
+        const imgEl = element.shadowRoot.querySelector('img');
+        expect(imgEl.getAttribute('src')).toBe(TEMPLATE1_LOGO_URL);
+    });
+
+    it('is accessible when template1 is shown', async () => {
+        const element = createElement('c-misc-multiple-templates', {
+            is: MiscMultipleTemplates
         });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
+    });
+
+    it('is accessible when template2 is shown', async () => {
+        const element = createElement('c-misc-multiple-templates', {
+            is: MiscMultipleTemplates
+        });
+        document.body.appendChild(element);
+
+        // Simulate user click
+        const button = element.shadowRoot.querySelector('lightning-button');
+        button.click();
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

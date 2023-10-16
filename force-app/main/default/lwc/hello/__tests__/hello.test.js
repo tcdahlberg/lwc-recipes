@@ -10,7 +10,7 @@ describe('c-hello', () => {
     });
 
     it('displays greeting', () => {
-        // Create element
+        // Create component
         const element = createElement('c-hello', {
             is: Hello
         });
@@ -19,5 +19,15 @@ describe('c-hello', () => {
         // Verify displayed greeting
         const div = element.shadowRoot.querySelector('div');
         expect(div.textContent).toBe('Hello, World!');
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-hello', {
+            is: Hello
+        });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

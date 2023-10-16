@@ -9,30 +9,41 @@ describe('c-hello-binding', () => {
         }
     });
 
-    it('displays greeting specified by change event target', () => {
-        const EXPECTED = 'Test';
+    // Helper function to wait until the microtask queue is empty. This is needed for promise
+    // timing when calling imperative Apex.
+    async function flushPromises() {
+        return Promise.resolve();
+    }
 
-        // Create element
+    it('displays greeting specified by change event target', async () => {
+        const EXPECTED_NAME = 'Codey';
+
+        // Create component
         const element = createElement('c-hello-binding', {
             is: HelloBinding
         });
         document.body.appendChild(element);
 
-        // Verify default greeting
-        let div = element.shadowRoot.querySelector('div');
-        expect(div.textContent).not.toBe(`Hello, ${EXPECTED}!`);
-
         // Trigger new greeting
         const inputEl = element.shadowRoot.querySelector('lightning-input');
-        inputEl.value = EXPECTED;
+        inputEl.value = EXPECTED_NAME;
         inputEl.dispatchEvent(new CustomEvent('change'));
 
-        // Return a promise to wait for any asynchronous DOM updates. Jest
-        // will automatically wait for the Promise chain to complete before
-        // ending the test and fail the test if the promise rejects.
-        return Promise.resolve().then(() => {
-            // Verify displayed greeting
-            expect(div.textContent).toBe(`Hello, ${EXPECTED}!`);
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Verify displayed greeting
+        const div = element.shadowRoot.querySelector('div');
+        expect(div.textContent).toBe(`Hello, ${EXPECTED_NAME}!`);
+    });
+
+    it('is accessible', async () => {
+        const element = createElement('c-hello-binding', {
+            is: HelloBinding
         });
+        document.body.appendChild(element);
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

@@ -5,11 +5,9 @@ import getContactList from '@salesforce/apex/ContactController.getContactList';
 // Mocking imperative Apex method call
 jest.mock(
     '@salesforce/apex/ContactController.getContactList',
-    () => {
-        return {
-            default: jest.fn()
-        };
-    },
+    () => ({
+        default: jest.fn()
+    }),
     { virtual: true }
 );
 
@@ -17,21 +15,11 @@ jest.mock(
 const APEX_CONTACTS_SUCCESS = [
     {
         Id: '0031700000pJRRSAA4',
-        Name: 'Amy Taylor',
-        Title: 'VP of Engineering',
-        Phone: '4152568563',
-        Email: 'amy@demo.net',
-        Picture__c:
-            'https://s3-us-west-1.amazonaws.com/sfdc-demo/people/amy_taylor.jpg'
+        Name: 'Amy Taylor'
     },
     {
         Id: '0031700000pJRRTAA4',
-        Name: 'Michael Jones',
-        Title: 'VP of Sales',
-        Phone: '4158526633',
-        Email: 'michael@demo.net',
-        Picture__c:
-            'https://s3-us-west-1.amazonaws.com/sfdc-demo/people/michael_jones.jpg'
+        Name: 'Michael Jones'
     }
 ];
 
@@ -55,67 +43,97 @@ describe('c-apex-imperative-method', () => {
 
     // Helper function to wait until the microtask queue is empty. This is needed for promise
     // timing when calling imperative Apex.
-    function flushPromises() {
-        // eslint-disable-next-line no-undef
-        return new Promise((resolve) => setImmediate(resolve));
+    async function flushPromises() {
+        return Promise.resolve();
     }
 
-    it('renders two contacts returned from imperative Apex call', () => {
+    it('renders two contacts returned from imperative Apex call', async () => {
         // Assign mock value for resolved Apex promise
         getContactList.mockResolvedValue(APEX_CONTACTS_SUCCESS);
 
-        // Create initial element
+        // Create component
         const element = createElement('c-apex-imperative-method', {
             is: ApexImperativeMethod
         });
         document.body.appendChild(element);
 
-        // Select button for executing Apex call
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return an immediate flushed promise (after the Apex call) to then
-        // wait for any asynchronous DOM updates. Jest will automatically wait
-        // for the Promise chain to complete before ending the test and fail
-        // the test if the promise ends in the rejected state.
-        return flushPromises().then(() => {
-            // Select div for validating conditionally changed text content
-            const detailEls = element.shadowRoot.querySelectorAll(
-                'p:not([class])'
-            );
-            expect(detailEls.length).toBe(APEX_CONTACTS_SUCCESS.length);
-            expect(detailEls[0].textContent).toBe(
-                APEX_CONTACTS_SUCCESS[0].Name
-            );
-            expect(detailEls[1].textContent).toBe(
-                APEX_CONTACTS_SUCCESS[1].Name
-            );
-        });
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+        await flushPromises();
+
+        // Verify displayed text
+        const detailEls = element.shadowRoot.querySelectorAll('p:not([class])');
+        expect(detailEls.length).toBe(APEX_CONTACTS_SUCCESS.length);
+        expect(detailEls[0].textContent).toBe(APEX_CONTACTS_SUCCESS[0].Name);
+        expect(detailEls[1].textContent).toBe(APEX_CONTACTS_SUCCESS[1].Name);
     });
 
-    it('renders the error panel when the Apex method returns an error', () => {
+    it('renders the error panel when the Apex method returns an error', async () => {
         // Assign mock value for rejected Apex promise
         getContactList.mockRejectedValue(APEX_CONTACTS_ERROR);
 
-        // Create initial element
+        // Create component
         const element = createElement('c-apex-imperative-method', {
             is: ApexImperativeMethod
         });
         document.body.appendChild(element);
 
-        // Select button for executing Apex call
+        // Click button
         const buttonEl = element.shadowRoot.querySelector('lightning-button');
         buttonEl.click();
 
-        // Return an immediate flushed promise (after the Apex call) to then
-        // wait for any asynchronous DOM updates. Jest will automatically wait
-        // for the Promise chain to complete before ending the test and fail
-        // the test if the promise ends in the rejected state.
-        return flushPromises().then(() => {
-            const errorPanelEl = element.shadowRoot.querySelector(
-                'c-error-panel'
-            );
-            expect(errorPanelEl).not.toBeNull();
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+        await flushPromises();
+
+        // Check for error panel
+        const errorPanelEl = element.shadowRoot.querySelector('c-error-panel');
+        expect(errorPanelEl).not.toBeNull();
+    });
+
+    it('is accessible when data is returned', async () => {
+        // Assign mock value for resolved Apex promise
+        getContactList.mockResolvedValue(APEX_CONTACTS_SUCCESS);
+
+        // Create component
+        const element = createElement('c-apex-imperative-method', {
+            is: ApexImperativeMethod
         });
+        document.body.appendChild(element);
+
+        // Click button
+        const buttonEl = element.shadowRoot.querySelector('lightning-button');
+        buttonEl.click();
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
+    });
+
+    it('is accessible when error is returned', async () => {
+        // Assign mock value for rejected Apex promise
+        getContactList.mockRejectedValue(APEX_CONTACTS_ERROR);
+
+        // Create component
+        const element = createElement('c-apex-imperative-method', {
+            is: ApexImperativeMethod
+        });
+        document.body.appendChild(element);
+
+        // Click button
+        const buttonEl = element.shadowRoot.querySelector('lightning-button');
+        buttonEl.click();
+
+        // Wait for any asynchronous DOM updates
+        await flushPromises();
+
+        // Check accessibility
+        await expect(element).toBeAccessible();
     });
 });

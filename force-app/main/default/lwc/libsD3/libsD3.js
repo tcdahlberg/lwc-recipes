@@ -2,6 +2,17 @@
 import { LightningElement } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { loadScript, loadStyle } from 'lightning/platformResourceLoader';
+/**
+ * When using this component in an LWR site, please import the below custom implementation of 'loadScript' module
+ * instead of the one from 'lightning/platformResourceLoader'
+ *
+ * import { loadScript } from 'c/resourceLoader';
+ *
+ * This workaround is implemented to get around a limitation of the Lightning Locker library in LWR sites.
+ * Read more about it in the "Lightning Locker Limitations" section of the documentation
+ * https://developer.salesforce.com/docs/atlas.en-us.exp_cloud_lwr.meta/exp_cloud_lwr/template_limitations.htm
+ */
+
 import D3 from '@salesforce/resourceUrl/d3';
 import DATA from './data';
 
@@ -11,28 +22,27 @@ export default class LibsD3 extends LightningElement {
 
     d3Initialized = false;
 
-    renderedCallback() {
+    async renderedCallback() {
         if (this.d3Initialized) {
             return;
         }
         this.d3Initialized = true;
 
-        Promise.all([
-            loadScript(this, D3 + '/d3.v5.min.js'),
-            loadStyle(this, D3 + '/style.css')
-        ])
-            .then(() => {
-                this.initializeD3();
-            })
-            .catch((error) => {
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Error loading D3',
-                        message: error.message,
-                        variant: 'error'
-                    })
-                );
-            });
+        try {
+            await Promise.all([
+                loadScript(this, D3 + '/d3.v5.min.js'),
+                loadStyle(this, D3 + '/style.css')
+            ]);
+            this.initializeD3();
+        } catch (error) {
+            this.dispatchEvent(
+                new ShowToastEvent({
+                    title: 'Error loading D3',
+                    message: error.message,
+                    variant: 'error'
+                })
+            );
+        }
     }
 
     initializeD3() {
