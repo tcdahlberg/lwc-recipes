@@ -1,23 +1,18 @@
 {
-  "orgName": "lwc-recipes - Dev Org",
+  "orgName": "LWC Recipes",
   "edition": "Developer",
-  "hasSampleData": true,
+  "hasSampleData": false,
+  "features": ["Walkthroughs", "EnableSetPasswordInApi"],
   "settings": {
-    "orgPreferenceSettings": {
-      "s1DesktopEnabled": true,
-      "chatterEnabled": true,
-      "translation": true,
-      "lightningExperienceSettings": {
-        "enableS1DesktopEnabled": true
-      },
-      "securitySettings": {
-        "passwordPolicies": {
-          "enableSetPasswordInApi": true
-        }
-      },
-      "mobileSettings": {
-        "enableS1EncryptedStoragePref2": false
-      }
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStoragePref2": false
+    },
+    "userEngagementSettings": {
+      "enableOrchestrationInSandbox": true,
+      "enableShowSalesforceUserAssist": false
     }
   }
 }

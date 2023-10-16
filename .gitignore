@@ -42,3 +42,7 @@ $RECYCLE.BIN/
 
 # Local environment variables
 .env
+
+.idea
+.vscode
+
